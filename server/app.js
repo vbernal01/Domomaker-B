@@ -8,6 +8,8 @@ const mongoose = require('mongoose');
 const expressHandleBars = require('express-handlebars');
 const helmet = require('helmet');
 const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
+const redis = require('redis');
 const router = require('./router.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
@@ -20,6 +22,14 @@ mongoose.connect(dbURI, (err) => {
   }
 });
 
+const redisURL = process.env.REDISCLOUD_URL ||
+    'redis://default:8Ovu6KBxumFmpAwRs7qVmqBEZziraNUO@redis-12513.c262.us-east-1-3.ec2.cloud.redislabs.com:12513';
+let redisClient = redis.createClient({
+  legacyMode: true,
+  url: redisURL,
+});
+redisClient.connect().catch(console.error);
+
 const app = express();
 
 app.use(helmet());
@@ -30,10 +40,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(session({
   key: 'sessionid',
+  store: new RedisStore({
+    client: redisClient,
+  }),
   secret: 'Domo Arigato',
   resave: true,
   saveUninitialized: true,
-}))
+  cookie: {
+    httpOnly: true,
+  },
+}));
 
 app.engine('handlebars', expressHandleBars.engine({ defaultLayout: '' }));
 app.set('view engine', 'handlebars');
