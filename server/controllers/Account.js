@@ -4,15 +4,15 @@ const { Account } = models;
 
 const loginPage = (req, res) => {
   res.render('login', { csrfToken: req.csrfToken() });
-}
+};
 
 const signupPage = (req, res) => {
   res.render('signup', { csrfToken: req.csrfToken() });
-}
+};
 const logout = (req, res) => {
   req.session.destroy();
   res.redirect('/');
-}
+};
 const login = (req, res) => {
   const username = `${req.body.username}`;
   const pass = `${req.body.pass}`;
