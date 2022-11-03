@@ -7,6 +7,7 @@ const requiresLogin = (req, res, next) => {
 
 const requiresLogout = (req, res, next) => {
   if (req.session.account) {
+    console.log("requires logout");
     return res.redirect('/maker');
   }
 
@@ -14,6 +15,7 @@ const requiresLogout = (req, res, next) => {
 };
 
 const requiresSecure = (req, res, next) => {
+  console.log("requires secure");
   if (req.headers['x-fowarded-proto'] !== 'https') {
     return res.redirect(`https://${req.hostname}${req.url}`);
   }
